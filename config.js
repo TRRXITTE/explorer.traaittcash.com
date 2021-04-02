@@ -5,7 +5,7 @@ var apiList = [
 ];
 var blockTargetInterval = 144;
 var coinUnits = 100000000;
-var symbol = 'TCH';
+var symbol = 'XTCASH';
 var refreshDelay = 15000;
 // pools stats by MainCoins
 var poolsStat =

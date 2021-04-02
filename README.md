@@ -4,7 +4,7 @@
 
 ### traaittCASH Blockchain Explorer
 
-Block explorer for traaittCASH CryptoNote based cryptocurrency based on the Karbowanec Block Explorer
+Block explorer for traaittCASH CryptoNote based cryptocurrency based on the Karbowanec transaction explorer
 
 #### Installation
 
@@ -17,7 +17,7 @@ Block explorer for traaittCASH CryptoNote based cryptocurrency based on the Karb
 ## Donate
 
 ```
-TCH: TCHcYag8GeAjELvfQZafXewWnPe5zUVPQCEVj444uBPJimCSVfT43Q4rCme6TVuxDPpuyUKs8q5PcJWf1w568HtcHUYyc75Gmh
+XTCASH: cashKdCEq5U7W2QDS5ffMETf1smoKLBm3C1GMYvPdEVUU9LKr1uDFrLNPkmfKgzcTcB4ASsypziCeVQ5iqkzC7fZ1pDDLSxgZF
 ```
 ```
 BTC: 3GVrutx2mdn7Gr63oVL83htgLBfMzXHJfT
