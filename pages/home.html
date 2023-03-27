@@ -291,8 +291,8 @@ $.ajax({
 			success: function(data){
 			block = data.result.block;
 				updateText('totalCoins', addCommas(getReadableCoins(block.alreadyGeneratedCoins,2)));
-				updateText('emissionPercent', (block.alreadyGeneratedCoins / 8874400000000000 * 100).toFixed(4) + "%");
-				updateText('currentReward', addCommas(getReadableCoins(block.baseReward,4)));
+				updateText('emissionPercent', (block.alreadyGeneratedCoins / 888888800000000 * 100).toFixed(2) + "%");
+				updateText('currentReward', addCommas(getReadableCoins(block.baseReward,8)));
 			}
 		});
     }
@@ -550,58 +550,65 @@ $('#goto-height').keyup(function(e){
 	}
 
 //  traaittCASH MemPool Transactions
-function getPoolTransactions(){
-  var xhrGetPool = $.ajax({
-	url: api + '/json_rpc',
-	method: "POST",
-	data: JSON.stringify({
-		jsonrpc: "2.0",
-		id: "test",
-		method: "f_mempool_json",
-		params: {}
-	}),
-	dataType: 'json',
-	cache: 'false',
-	success: function(newdata) {
-		if(typeof newdata.result !== "undefined") {
-			var data = newdata.result.mempool;
-			var totalAmount = 0;
-			var totalFee = 0;
-			var totalSize = 0;
-			var txcount = 0;
-			var txsRows = document.getElementById('mem_pool_rows');
-			  if (txsRows) {
-				while (txsRows.firstChild) {
-				  txsRows.removeChild(txsRows.firstChild);
-				}
-			  }
-			for (var i = 0; i < data.length; i ++){
-				var tx = data[i];
+function getPoolTransactions() {
+    var xhrGetPool = $.ajax({
+        url: api + '/json_rpc',
+        method: "POST",
+        data: JSON.stringify({
+            jsonrpc:"2.0",
+            id: "test",
+            method:"f_on_transactions_pool_json",
+            params: {}
+        }),
+        dataType: 'json',
+        cache: 'false',
+        success: function(newdata) {
+            if(typeof newdata.result !== "undefined") {
+                var transactions = newdata.result.transactions;
+                var txsRows = document.getElementById('mem_pool_rows');
+                while (txsRows.firstChild) {
+                    txsRows.removeChild(txsRows.firstChild);
+                }
+                for(var i = 0; i < transactions.length; i++) {
+                    var tx = transactions[i];
+                    var hash = tx.hash;
+                    if(hash != "") {
+                        var amount = tx.amount_out;
+                        var fee = tx.fee;
+                        var size = tx.size;
+                        var row = document.createElement('tr');
+                        var timestamp = tx.receive_time;
+                        var columns =
+                            '<td>' + formatDate(timestamp) + ' (<span class="mtx-ago"></span>)' + '</td>' +
+                            '<td>' + getReadableCoins(amount, 4, true) + '</td>' +
+                            '<td>' + getReadableCoins(fee, 4, true) + '</td>' +
+                            '<td>' + formatBytes(size) + '</td>' +
+                            '<td>' + formatPaymentLink(hash) + '</td>';
+                        row.innerHTML = columns;
+                        $(txsRows).append(row);
+                        $(row).find('.mtx-ago').timeago('update', new Date(timestamp * 1000).toISOString());
+                    }
+                }
+                updateText('mempool_count', transactions.length);
+                var totalAmount = sumField(transactions, 'amount_out');
+                var totalFee = sumField(transactions, 'fee');
+                var totalSize = sumField(transactions, 'size');
+                updateText('mempool_amount', addCommas(getReadableCoins(totalAmount, 4)));
+                updateText('mempool_fees', getReadableCoins(totalFee, 8));
+                updateText('mempool_sizes', formatBytes(totalSize));
+            }
+        },
+        error: function(data) {
+            console.log(data);
+        }
+    });
+};
 
-				var row = document.createElement('tr');
-				var columns =
-					'<td>' + formatDate(tx.receiveTime) + ' (<span class="mtx-ago"></span>)' + '</td>' +
-					'<td>' + addCommas(getReadableCoins(tx.amount_out, 4, true)) + '</td>' +
-					'<td>' + getReadableCoins(tx.fee, 4, true) + '</td>' +
-					'<td>' + formatBytes(parseInt(tx.size)) + '</td>' +
-					'<td>' + formatPaymentLink(tx.hash) + '</td>';
-				row.innerHTML = columns;
-				$(txsRows).append(row);
-				$(row).find('.mtx-ago').timeago('update', new Date(tx.receiveTime * 1000).toISOString());
-
-				txcount = txcount + 1;
-				totalAmount = tx.amount_out + totalAmount;
-				totalFee = totalFee + tx.fee;
-				totalSize = totalSize + tx.size;
-
-			}
-			updateText('mempool_count', txcount);
-			updateText('mempool_amount', addCommas(getReadableCoins(totalAmount,4)));
-			updateText('mempool_fees', getReadableCoins(totalFee, 8));
-			updateText('mempool_sizes', formatBytes(parseInt(totalSize)));
-		}
-	}
-  });
+// helper function to sum a field in an array of objects
+function sumField(arr, field) {
+    return arr.reduce(function(sum, obj) {
+        return sum + obj[field];
+    }, 0);
 }
 
 // Difficulty chart
